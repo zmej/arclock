@@ -12,9 +12,8 @@ defmodule Arclock.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Arclock.PubSub},
       # Start the Endpoint (http/https)
-      ArclockWeb.Endpoint
-      # Start a worker by calling: Arclock.Worker.start_link(arg)
-      # {Arclock.Worker, arg}
+      ArclockWeb.Endpoint,
+      Arclock.Display
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

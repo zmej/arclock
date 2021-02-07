@@ -16,7 +16,7 @@ defmodule Arclock.Display do
   Example:
   {:ok, pid} = Arclock.Display.start_link
   """
-  def start_link do
+  def start_link(_) do
     GenServer.start_link(__MODULE__, nil, name: :display)
   end
 
