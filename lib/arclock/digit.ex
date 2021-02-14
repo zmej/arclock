@@ -1,6 +1,6 @@
 defmodule Arclock.Digit do
   @moduledoc """
-  Drives GPIO outputs for 7-segment decoder of digits of given order.
+  Drives GPIO outputs connected to 7-segment digit controller of digit of given order.
   """    
 
   use GenServer
@@ -8,7 +8,14 @@ defmodule Arclock.Digit do
 
   require Logger
 
+  # Initial value of GPIO pin.
   @initial_value 0
+
+  # This character must be sent to controller to initilize it.
+  @controller_init_command 8
+
+  # Enables visual feedback that controller was initialized.
+  @controller_init_delay 2000
 
   #====================================
   # API
@@ -48,8 +55,11 @@ defmodule Arclock.Digit do
       |> Enum.into(%{})
 
     state = %{magnitude: magnitude, pins: pins, digits: digits, digit: default}
-    set_digit(default, state)
 
+    set_digit(@controller_init_command, state)
+    Process.sleep(@controller_init_delay)
+
+    set_digit(default, state)
     Logger.info("Digit: #{magnitude} initialized on pins #{inspect(pin_numbers)} with value #{default}")
     {:ok, state}
   end

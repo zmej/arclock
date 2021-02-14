@@ -7,7 +7,7 @@ defmodule Arclock.Display do
   require Logger
 
   @tick_interval 1000
-  @default_shift :ab
+  @default_shift :no_shift
 
   #====================================
   # API
@@ -20,18 +20,22 @@ defmodule Arclock.Display do
     GenServer.start_link(__MODULE__, nil, name: :display)
   end
 
-  def set_ab(pid) do
+  def set_ab_shift(pid) do
     GenServer.cast(pid, {:set_shift, :ab})
+  end
+
+   def set_cd_shift(pid) do
+    GenServer.cast(pid, {:set_shift, :cd})
+  end
+
+  def set_no_shift(pid) do
+    GenServer.cast(pid, {:set_shift, :no_shift})
   end
 
   def get_shift(pid) do
     GenServer.call(pid, :get_shift)
   end
 
-  def set_cd(pid) do
-    GenServer.cast(pid, {:set_shift, :cd})
-  end
-  
   def start_countdown(pid, value) do
     GenServer.cast(pid, {:start_countdown, value})
   end
@@ -53,8 +57,8 @@ defmodule Arclock.Display do
 
   @impl true
   def init(_) do
-    Digit.start_link(:ones, :b)
-    Digit.start_link(:tens, :a)
+    Digit.start_link(:ones, :blank)
+    Digit.start_link(:tens, :blank)
     Digit.start_link(:hundreds, :blank)
     
     state = %{
@@ -159,6 +163,7 @@ defmodule Arclock.Display do
 
   defp split_shift(:ab), do: {:a, :b}
   defp split_shift(:cd), do: {:c, :d}
+  defp split_shift(:no_shift), do: {:dash, :dash}
 
   def split_magnitudes(number) do
     hundreds = div(number, 100)

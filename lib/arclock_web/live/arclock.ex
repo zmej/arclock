@@ -2,6 +2,8 @@ defmodule ArclockWeb.Arclock do
 
   use Phoenix.LiveView
 
+  require Logger
+
   alias Arclock.Display
 
   def mount(_params, _session, socket) do
@@ -56,7 +58,7 @@ defmodule ArclockWeb.Arclock do
     ~L"""
     <div>
       <div><h1>ŘADA: <%= @shift %></h1></div>
-      <div><h1>DÉLKA SADY: <%= @timer %></h1></div>
+      <div><h1>DÉLKA SADY: <%= @timer %> sekund</h1></div>
 
       <div>
          <h2>Řízení řad</h2>
@@ -74,21 +76,21 @@ defmodule ArclockWeb.Arclock do
       <div>
         <h2>Nastavení délky sady</h2>
         <h3>Jednotlivci</h3>
-        <button phx-click="set_timer_120">Sada 3 šípy (120 s)</button>
-        <button phx-click="set_timer_240">Sada 6 šípů (240 s)</button>
-        <button phx-click="set_timer_20">Rozstřel 1 šíp (20 s)</button>
+        <button phx-click="set_timer_120">Sada 3 šípy (120)</button>
+        <button phx-click="set_timer_240">Sada 6 šípů (240)</button>
+        <button phx-click="set_timer_20">Rozstřel 1 šíp (20)</button>
       </div>
 
       <div>
         <h3>Družstva</h3>
-        <button phx-click="set_timer_240">Sada 6 šípů (120 s)</button>
-        <button phx-click="set_timer_60">Rozstřel 3 šípy (60 s)</button>
+        <button phx-click="set_timer_240">Sada 6 šípů (120)</button>
+        <button phx-click="set_timer_60">Rozstřel 3 šípy (60)</button>
       </div>
 
       <div>
         <h3>Smíšená družstva</h3>
-        <button phx-click="set_timer_80">Sada 4 šípy (80 s)</button>
-        <button phx-click="set_timer_40">Rozstřel 2 šípy (40 s)</button>
+        <button phx-click="set_timer_80">Sada 4 šípy (80)</button>
+        <button phx-click="set_timer_40">Rozstřel 2 šípy (40)</button>
       </div>
 
     </div>
@@ -96,23 +98,29 @@ defmodule ArclockWeb.Arclock do
   end
 
   defp set_ab_shift(_value) do
-    Display.set_ab(:display)
+    Display.set_ab_shift(:display)
     "AB"
   end
     
   defp set_cd_shift(_value) do
-    Display.set_cd(:display)
+    Display.set_cd_shift(:display)
     "CD"
   end
 
   defp set_no_shift(_value) do
+    Display.set_no_shift(:display)
     "--"
   end
 
   defp start(socket) do
-    IO.inspect(socket)
+    time = socket.assigns.timer
 
-    Display.start_countdown(:display, 20)
+    if is_integer(time) do
+      Display.start_countdown(:display, time)
+    else
+      Logger.warn("Timer value #{time} is not an integer")
+    end
+ 
     socket
   end
 
