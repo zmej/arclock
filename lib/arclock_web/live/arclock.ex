@@ -98,17 +98,17 @@ defmodule ArclockWeb.Arclock do
   end
 
   defp set_ab_shift(_value) do
-    Display.set_ab_shift(:display)
+    Display.set_ab_shift()
     "AB"
   end
     
   defp set_cd_shift(_value) do
-    Display.set_cd_shift(:display)
+    Display.set_cd_shift()
     "CD"
   end
 
   defp set_no_shift(_value) do
-    Display.set_no_shift(:display)
+    Display.set_no_shift()
     "--"
   end
 
@@ -116,7 +116,7 @@ defmodule ArclockWeb.Arclock do
     time = socket.assigns.timer
 
     if is_integer(time) do
-      Display.start_countdown(:display, time)
+      Display.start_countdown(time)
     else
       Logger.warn("Timer value #{time} is not an integer")
     end
@@ -125,7 +125,7 @@ defmodule ArclockWeb.Arclock do
   end
 
   defp stop(socket) do
-    Display.stop_countdown(:display)
+    Display.stop_countdown()
     socket
   end
 end

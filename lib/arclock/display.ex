@@ -3,6 +3,7 @@ defmodule Arclock.Display do
   use GenServer
 
   alias Arclock.Digit
+  alias Arclock.Buzzer
 
   require Logger
 
@@ -20,36 +21,36 @@ defmodule Arclock.Display do
     GenServer.start_link(__MODULE__, nil, name: :display)
   end
 
-  def set_ab_shift(pid) do
-    GenServer.cast(pid, {:set_shift, :ab})
+  def set_ab_shift do
+    GenServer.cast(:display, {:set_shift, :ab})
   end
 
-   def set_cd_shift(pid) do
-    GenServer.cast(pid, {:set_shift, :cd})
+   def set_cd_shift do
+    GenServer.cast(:display, {:set_shift, :cd})
   end
 
-  def set_no_shift(pid) do
-    GenServer.cast(pid, {:set_shift, :no_shift})
+  def set_no_shift do
+    GenServer.cast(:display, {:set_shift, :no_shift})
   end
 
-  def get_shift(pid) do
-    GenServer.call(pid, :get_shift)
+  def get_shift do
+    GenServer.call(:display, :get_shift)
   end
 
-  def start_countdown(pid, value) do
-    GenServer.cast(pid, {:start_countdown, value})
+  def start_countdown(value) do
+    GenServer.cast(:display, {:start_countdown, value})
   end
 
-  def stop_countdown(pid) do
-    GenServer.cast(pid, :stop_countdown)
+  def stop_countdown do
+    GenServer.cast(:display, :stop_countdown)
   end
 
-  def get_counter(pid) do
-    GenServer.call(pid, :get_counter)
+  def get_counter do
+    GenServer.call(:display, :get_counter)
   end
 
-  def is_running?(pid) do
-    GenServer.call(pid, :get_running)
+  def is_running? do
+    GenServer.call(:display, :get_running)
   end
 
   #====================================
