@@ -61,11 +61,13 @@ defmodule Arclock.Display do
     Digit.start_link(:ones, :blank)
     Digit.start_link(:tens, :blank)
     Digit.start_link(:hundreds, :blank)
-    
+    buzzer = Buzzer.init()    
+
     state = %{
       counter: 0,
       shift: @default_shift,
-      running: false
+      running: false,
+      buzzer: buzzer
     }
 
     display_shift(@default_shift)
@@ -100,6 +102,7 @@ defmodule Arclock.Display do
   end
 
   def handle_cast(:stop_countdown, state) do
+    Buzzer.stop_shooting(state.buzzer)
     display_shift(state.shift)
     Logger.info("Display: countdown stopped, current counter value is #{state.counter}")
     {:noreply, %{state | counter: 0, running: false}}

@@ -19,17 +19,17 @@ defmodule Arclock.Buzzer do
     end
   end
 
-  def prepare(pin) do
+  def prepare_shooting(pin) when not is_nil(pin) do
     beep(pin)
     quiet()
     beep(pin)
   end
 
-  def start_shooting(pin) do
+  def start_shooting(pin) when not is_nil(pin) do
     beep(pin)
   end
 
-  def stop_shooting(pin) do
+  def stop_shooting(pin) when not is_nil(pin) do
     beep(pin)
     quiet()
     beep(pin)
