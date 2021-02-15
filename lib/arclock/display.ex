@@ -7,7 +7,8 @@ defmodule Arclock.Display do
 
   require Logger
 
-  @tick_interval 1000
+  @shooting_preparation_time 10 # seconds
+  @tick_interval 1000           # milliseconds
   @default_shift :no_shift
 
   #====================================
@@ -49,9 +50,16 @@ defmodule Arclock.Display do
     GenServer.call(:display, :get_counter)
   end
 
-  def is_running? do
-    GenServer.call(:display, :get_running)
-  end
+  #====================================
+  # State Description
+  # set_length: Required length of set in seconds. 
+  # counter: Remaining secods. Decremented by one every second to the zero.
+  # shift: Current shift is displayed before or after countdown.
+  # countdown_state: :preparation | :shooting | :iddle
+  #   :preparation - After judge starts countdown shooters have 10 seconds to enter the shooting line
+  #   :shooting - Time for shooting arrows.
+  #   :idle - Time between sets.
+  # buzzer: Output pin to control buzzer. 
 
   #====================================
   # Callbacks
@@ -64,9 +72,10 @@ defmodule Arclock.Display do
     buzzer = Buzzer.init()    
 
     state = %{
+      set_length: 0,
       counter: 0,
       shift: @default_shift,
-      running: false,
+      countdown_state: :idle,
       buzzer: buzzer
     }
 
@@ -76,27 +85,35 @@ defmodule Arclock.Display do
   end
 
   @impl true
-  def handle_cast({:set_shift, shift}, state) do
-    if state.counter == 0 do
-      display_shift(shift)
-    end
-
+  def handle_cast({:set_shift, shift}, %{countdown_state: :idle} = state) do
+    # Display can be changed only when countdown is not running.
+    display_shift(shift)
     {:noreply, %{state | shift: shift}}
   end
 
-  def handle_cast({:start_countdown, _value}, %{running: true} = state) do
+  def handle_cast({:set_shift, shift}, state) do
+    # When countdown is running then only state is changed. 
+    # New shift will be displayed after countdown stop.
+    {:noreply, %{state | shift: shift}}
+  end
+
+  def handle_cast({:start_countdown, _value}, %{countdown_state: countdown_state} = state) when countdown_state != :idle do
     Logger.warn("Display: cannot start new countdown while previous one is still running")
     {:noreply, state}    
   end
 
   def handle_cast({:start_countdown, value}, state) do
-    display_counter(value)
+    Buzzer.prepare_shooting(state.buzzer)
+    display_counter(@shooting_preparation_time)
     Logger.info("Display: started countdown from #{value}")
     tick()
-    {:noreply, %{state | counter: value, running: true}}
+    {:noreply, %{state | 
+      set_length: value,
+      counter: @shooting_preparation_time,
+      countdown_state: :preparation}}
   end
 
-  def handle_cast(:stop_countdown, %{running: :false} = state) do
+  def handle_cast(:stop_countdown, %{countdown_state: :idle} = state) do
     Logger.info("Display: countdown already stopped")
     {:noreply, state}
   end
@@ -105,19 +122,27 @@ defmodule Arclock.Display do
     Buzzer.stop_shooting(state.buzzer)
     display_shift(state.shift)
     Logger.info("Display: countdown stopped, current counter value is #{state.counter}")
-    {:noreply, %{state | counter: 0, running: false}}
+    {:noreply, %{state | counter: 0, countdown_state: :idle}}
   end
 
   @impl true
-  def handle_info(:tick, %{running: false} = state) do
+  def handle_info(:tick, %{countdown_state: :idle} = state) do
     # When counting was stopped by user but there is palnned tick in the mailbox
     {:noreply, state}
   end
 
-  def handle_info(:tick, %{counter: 0} = state) do
+  def handle_info(:tick, %{counter: 0, countdown_state: :shooting} = state) do
+    Buzzer.stop_shooting(state.buzzer)
     display_shift(state.shift)
     Logger.info("Display: counter elapsed")
-    {:noreply, %{state | running: false}}
+    {:noreply, %{state | countdown_state: :idle}}
+  end
+
+  def handle_info(:tick, %{counter: 0, countdown_state: :preparation} = state) do
+    Buzzer.start_shooting(state.buzzer)
+    display_counter(state.set_length)
+    tick()
+    {:noreply, %{state | countdown_state: :shooting, counter: state.set_length}}
   end
 
   def handle_info(:tick, state) do
@@ -134,10 +159,6 @@ defmodule Arclock.Display do
 
   def handle_call(:get_shift, _from, %{:shift => shift} = state) do
     {:reply, shift, state}
-  end
-
-  def handle_call(:get_running, _from, state) do
-    {:reply, state.running, state}
   end
 
   #====================================
