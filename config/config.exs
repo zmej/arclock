@@ -18,9 +18,9 @@ config :arclock, ArclockWeb.Endpoint,
 config :arclock,
   # pin numbers for orders of magnitude
   # GPIO numbering, not physical numbering.
-  ones: %{a: 4, b: 17, c: 27, d: 22}, 
+  hundreds: %{a: 4, b: 17, c: 27, d: 22}, 
   tens: %{a: 10, b: 9, c: 11, d: 5},
-  hundreds: %{a: 6, b: 13, c: 19, d: 26},
+  ones: %{a: 6, b: 13, c: 19, d: 26},
 
   buzzer_pin: 21,
 
@@ -32,7 +32,7 @@ config :arclock,
     3 => %{a: 0, b: 0, c: 1, d: 1},
     4 => %{a: 0, b: 1, c: 0, d: 0},
     5 => %{a: 0, b: 1, c: 0, d: 1},
-    6 => %{a: 0, b: 1, c: 0, d: 0},
+    6 => %{a: 0, b: 1, c: 1, d: 0},
     7 => %{a: 0, b: 1, c: 1, d: 1},
     8 => %{a: 1, b: 0, c: 0, d: 0},
     9 => %{a: 1, b: 0, c: 0, d: 1},
@@ -40,7 +40,7 @@ config :arclock,
     :b => %{a: 1, b: 0, c: 1, d: 1},
     :c => %{a: 1, b: 1, c: 0, d: 0},
     :d => %{a: 1, b: 1, c: 0, d: 1},
-    :dash => %{a: 1, b: 1, c: 1, d: 1},
+    :dash => %{a: 1, b: 1, c: 1, d: 0},
     :blank => %{a: 1, b: 1, c: 1, d: 1}
   }
 

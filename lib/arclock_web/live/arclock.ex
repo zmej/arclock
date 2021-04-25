@@ -30,8 +30,8 @@ defmodule ArclockWeb.Arclock do
     {:noreply, stop(socket)}
   end
 
-  def handle_event("set_timer_20", _, socket) do
-    {:noreply, update(socket, :timer, fn _ -> 20 end)}
+  def handle_event("set_timer_30", _, socket) do
+    {:noreply, update(socket, :timer, fn _ -> 30 end)}
   end
 
   def handle_event("set_timer_40", _, socket) do
@@ -46,12 +46,16 @@ defmodule ArclockWeb.Arclock do
     {:noreply, update(socket, :timer, fn _ -> 80 end)}
   end
 
+  def handle_event("set_timer_90", _, socket) do
+    {:noreply, update(socket, :timer, fn _ -> 90 end)}
+  end
+
   def handle_event("set_timer_120", _, socket) do
     {:noreply, update(socket, :timer, fn _ -> 120 end)}
   end
 
-  def handle_event("set_timer_240", _, socket) do
-    {:noreply, update(socket, :timer, fn _ -> 240 end)}
+  def handle_event("set_timer_180", _, socket) do
+    {:noreply, update(socket, :timer, fn _ -> 180 end)}
   end
 
   def render(assigns) do
@@ -76,14 +80,14 @@ defmodule ArclockWeb.Arclock do
       <div>
         <h2>Nastavení délky sady</h2>
         <h3>Jednotlivci</h3>
-        <button phx-click="set_timer_120">Sada 3 šípy (120)</button>
-        <button phx-click="set_timer_240">Sada 6 šípů (240)</button>
-        <button phx-click="set_timer_20">Rozstřel 1 šíp (20)</button>
+        <button phx-click="set_timer_90">Sada 3 šípy (90)</button>
+        <button phx-click="set_timer_180">Sada 6 šípů (180)</button>
+        <button phx-click="set_timer_30">Rozstřel 1 šíp (30)</button>
       </div>
 
       <div>
         <h3>Družstva</h3>
-        <button phx-click="set_timer_240">Sada 6 šípů (120)</button>
+        <button phx-click="set_timer_120">Sada 6 šípů (120)</button>
         <button phx-click="set_timer_60">Rozstřel 3 šípy (60)</button>
       </div>
 
